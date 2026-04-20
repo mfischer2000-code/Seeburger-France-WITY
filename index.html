@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WITY Trainer — Marché Français</title>
+  <title>WITY Trainer — France</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -27,7 +27,7 @@ const PERSONAS = [
     role: "DSI",
     company: "Vaillant Industries, Lyon",
     industry: "Industrie / Manufacturing",
-    difficulty: "Moyen",
+    difficulty_fr: "Moyen", difficulty_en: "Medium",
     diffColor: "#FF8F00",
     context: "Groupe industriel français, 3.200 employés, 4 sites de production. En cours de migration SAP S/4HANA (go-live prévu T4 2026). Utilise un EDI legacy depuis 15 ans, non compatible S/4HANA. Deux intégrateurs différents selon les sites. Le projet EDI n'était pas dans le scope initial de la migration.",
     personality: "Ingénieur de formation, pragmatique et factuel. Méfiant vis-à-vis des éditeurs qui promettent trop. Pose des questions techniques précises. S'impatiente si le commercial parle avant d'avoir compris le problème. Apprécie les références secteur et les chiffres concrets.",
@@ -40,7 +40,7 @@ const PERSONAS = [
     role: "Directrice Administrative et Financière",
     company: "Groupe Hermès Distribution, Paris",
     industry: "Distribution / Retail",
-    difficulty: "Difficile",
+    difficulty_fr: "Difficile", difficulty_en: "Hard",
     diffColor: "#D32F2F",
     context: "Distributeur B2B national, 850 M€ de CA, 12.000 fournisseurs actifs. Obligation de facturation électronique : doit émettre des e-factures au format Factur-X dès janvier 2026 et recevoir via Peppol. Actuellement : 80% des factures traitées manuellement par une équipe de 12 personnes. Aucune solution en place.",
     personality: "Directe, chiffres-orientée, peu de temps. Ne veut pas entendre parler de technologie — elle veut savoir combien ça coûte, combien ça économise, et si la conformité légale est garantie. Interrompt si c'est trop technique. Décide vite si elle est convaincue.",
@@ -53,7 +53,7 @@ const PERSONAS = [
     role: "Directeur Supply Chain",
     company: "Précision Mécanique SA, Nantes",
     industry: "Automotive Tier-2",
-    difficulty: "Moyen",
+    difficulty_fr: "Moyen", difficulty_en: "Medium",
     diffColor: "#FF8F00",
     context: "Équipementier Tier-2 automobile, fournisseur de Stellantis, Renault et Valeo. Obligé d'échanger en EDI avec ces trois clients (formats différents : EDIFACT, ANSI X12, format propriétaire Renault). Utilise un prestataire EDI externalisé depuis 8 ans — contrat qui expire dans 6 mois, renégociation impossible aux conditions actuelles.",
     personality: "Opérationnel, pense en flux et délais. Allergique aux interruptions de service. Comprend l'EDI en tant qu'utilisateur mais pas techniquement. Veut savoir si le prestataire peut reprendre les connexions existantes sans interruption. Demande systématiquement des SLA et des références clients automobiles.",
@@ -66,12 +66,64 @@ const PERSONAS = [
     role: "DSI Groupe",
     company: "Éclat Retail Group, Bordeaux",
     industry: "Retail / E-commerce",
-    difficulty: "Difficile",
+    difficulty_fr: "Difficile", difficulty_en: "Hard",
     diffColor: "#D32F2F",
     context: "Groupe retail en forte croissance par acquisitions : 3 enseignes rachetées en 18 mois. Chaque enseigne a son propre ERP (SAP, Dynamics, Sage) et ses propres connexions EDI avec les fournisseurs. 4 systèmes d'intégration différents, aucune visibilité centralisée. Le COMEX a fixé un objectif : une seule plateforme d'intégration d'ici fin 2026.",
-    personality: "Politique, bon communicant, pense à son image auprès du COMEX. Sait qu'il a un problème mais attend que le commercial l'articule clairement. Sensible aux témoignages d'autres DSI dans le retail. Cherche un partenaire stratégique, pas un simple fournisseur. Sera difficile à convaincre si le commercial ne comprend pas les enjeux post-M&A.",
+    personality: "Politique, bon communicant, pense à son image auprès du COMEX. Sait qu'il a un problème mais attend que le commercial l'articule clairement. Sensible aux témoignages d'autres DSI dans le retail. Cherche un partenaire stratégique, pas un simple fournisseur.",
     hiddenPain: "Le COMEX lui a fixé un budget et un délai — mais la vraie pression vient du fait que si la consolidation échoue, une partie de son équipe sera externalisée. Un cabinet de conseil a déjà été mandaté pour évaluer l'option outsourcing total. Il doit démontrer la valeur de son équipe en interne d'ici 12 mois.",
     triggers: ["Consolidation post-M&A", "Multi-ERP", "Plateforme unique", "Visibilité temps réel"]
+  },
+  {
+    id: "rsi-pharma",
+    name: "Isabelle Fontaine",
+    role: "Responsable Systèmes d'Information",
+    company: "BioPharma Rhône, Grenoble",
+    industry: "Pharma / Life Sciences",
+    difficulty_fr: "Difficile", difficulty_en: "Hard",
+    diffColor: "#D32F2F",
+    context: "Laboratoire pharmaceutique français, 600 employés, filiale d'un groupe américain. Soumis aux normes GxP et FDA 21 CFR Part 11 pour la traçabilité des échanges. Utilise un EDI on-premise vieillissant pour les échanges avec les grossistes et hôpitaux. Le groupe américain impose une migration vers le cloud d'ici fin 2026.",
+    personality: "Rigoureuse, très attachée à la conformité réglementaire. Refuse toute solution qui ne peut pas prouver une validation GxP documentée. Parle lentement, réfléchit avant de répondre. Ne prend aucune décision sans impliquer son responsable Qualité. Méfiante envers les promesses commerciales non étayées.",
+    hiddenPain: "Un audit FDA il y a 3 mois a relevé des lacunes dans la traçabilité des échanges EDI. Elle a 6 mois pour corriger avant un audit de suivi. Si les lacunes persistent, l'autorisation de mise sur le marché de deux produits phares pourrait être suspendue. Elle porte ce risque seule.",
+    triggers: ["Conformité GxP", "Validation FDA", "Cloud sécurisé", "Traçabilité EDI"]
+  },
+  {
+    id: "cfo-logistique",
+    name: "Marc Delacroix",
+    role: "Directeur Financier",
+    company: "TransEurope Logistics, Lille",
+    industry: "Logistique / Transport",
+    difficulty_fr: "Moyen", difficulty_en: "Medium",
+    diffColor: "#FF8F00",
+    context: "Opérateur logistique 3PL, 1.400 employés, présent en France, Belgique et Pologne. Gère les flux EDI de 200 clients actifs (ordres, avis d'expédition, factures). L'équipe IT actuelle de 3 personnes est débordée. Le prestataire EDI actuel facture à la connexion — les coûts ont doublé en 2 ans avec la croissance.",
+    personality: "Financier pur. Raisonne en coût total de possession, ROI et payback period. N'a pas de patience pour le jargon technique. Pose la question 'combien ?' toutes les 3 minutes. Sensible aux comparatifs chiffrés. Sera convaincu par un business case solide, pas par des promesses de modernité.",
+    hiddenPain: "Deux clients majeurs représentant 28% du CA ont émis des ultimatums : soit TransEurope implémente des API REST pour les échanges temps réel d'ici septembre 2026, soit ils changent de prestataire. Marc n'a pas encore chiffré l'impact de leur départ pour le board.",
+    triggers: ["Réduction coûts EDI", "API REST clients", "ROI mesurable", "Scalabilité"]
+  },
+  {
+    id: "dsi-energie",
+    name: "Nathalie Perrin",
+    role: "DSI",
+    company: "Énergies Nouvelles du Sud, Toulouse",
+    industry: "Énergie / Utilities",
+    difficulty_fr: "Moyen", difficulty_en: "Medium",
+    diffColor: "#FF8F00",
+    context: "Producteur d'énergie renouvelable en forte croissance, 420 employés. Vient de remporter 3 appels d'offres publics qui imposent des échanges EDI standardisés avec RTE et Enedis. N'a jamais fait d'EDI — tout passe actuellement par des portails web manuels et des emails. Doit être opérationnel en 4 mois.",
+    personality: "Curieuse et ouverte, mais consciente de sa méconnaissance du sujet EDI. Cherche quelqu'un qui peut l'éduquer sans la noyer. Apprécie la pédagogie et les analogies simples. Prend des notes. Devient méfiante si elle sent qu'on lui vend quelque chose de trop complexe pour son équipe.",
+    hiddenPain: "Les contrats signés avec RTE et Enedis prévoient des pénalités de 15.000€ par mois de retard sur la mise en conformité EDI. Elle a signé sans mesurer la complexité technique. Son PDG croit que c'est réglé. Elle ne lui a pas encore dit que non.",
+    triggers: ["Premier projet EDI", "RTE / Enedis", "Time-to-live 4 mois", "Pénalités contractuelles"]
+  },
+  {
+    id: "vp-agroalim",
+    name: "Pierre-Henri Aumont",
+    role: "VP Operations",
+    company: "Terroirs et Saveurs Group, Rungis",
+    industry: "Agroalimentaire / GMS",
+    difficulty_fr: "Difficile", difficulty_en: "Hard",
+    diffColor: "#D32F2F",
+    context: "Groupe agroalimentaire, 2.800 employés, fournisseur de Carrefour, Leclerc et Intermarché. Les grandes surfaces imposent des formats EDI stricts (GS1, EANCOM) et des délais de réponse de moins de 30 minutes sur les confirmations de commande. Taux d'erreur EDI actuel : 6,8%. Chaque erreur génère une pénalité fournisseur.",
+    personality: "Sous pression permanente, pense en délais et pénalités. Connaît bien l'EDI d'un point de vue métier. Très direct, parfois abrupt. N'a pas de temps pour les présentations corporate. Veut parler à quelqu'un qui connaît les spécificités GMS. Teste rapidement la crédibilité de l'interlocuteur.",
+    hiddenPain: "Leclerc vient de l'informer qu'au-delà de 5% d'erreurs EDI sur un trimestre, ils appliquent une déduction automatique de 2% sur toutes les factures. Sur 45M€ de CA Leclerc, ça représente 900K€ annuels. Il n'a pas encore intégré ce risque dans le budget 2026 présenté au conseil.",
+    triggers: ["Taux d'erreur EDI", "GS1 / EANCOM", "Pénalités GMS", "SLA 30 minutes"]
   }
 ];
 
@@ -128,9 +180,7 @@ function ScoreBar({ score }) {
 
 function App() {
   const [screen, setScreen] = useState("select");
-  const [apiKey, setApiKey] = useState("");
-  const [apiKeyInput, setApiKeyInput] = useState("");
-  const [lang, setLang] = useState("fr"); // fr or en
+  const [lang, setLang] = useState("fr");
   const [persona, setPersona] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -139,7 +189,6 @@ function App() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [turnCount, setTurnCount] = useState(0);
   const [error, setError] = useState(null);
-  const [showTranslation, setShowTranslation] = useState({});
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -148,32 +197,34 @@ function App() {
 
   const t = (fr, en) => lang === "fr" ? fr : en;
 
+  const LangToggle = () => (
+    <div style={{display:"flex",gap:6}}>
+      {["fr","en"].map(l=>(
+        <button key={l} onClick={()=>setLang(l)}
+          style={{padding:"5px 12px",border:`2px solid ${lang===l?"#2E7D32":"#DDD"}`,borderRadius:20,background:lang===l?"#E8F5E9":"#fff",color:lang===l?"#2E7D32":"#888",fontWeight:600,cursor:"pointer",fontSize:12,fontFamily:"'DM Sans',sans-serif"}}>
+          {l==="fr"?"🇫🇷 FR":"🇬🇧 EN"}
+        </button>
+      ))}
+    </div>
+  );
+
   async function callAPI(payload) {
     const res = await fetch("/api/claude", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        
-        "anthropic-version": "2023-06-01"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
     return res.json();
   }
 
-  function parsePersonaMsg(raw) {
-    try {
-      const clean = raw.replace(/```json|```/g,"").trim();
-      return JSON.parse(clean);
-    } catch(e) {
-      return { fr: raw, en: raw };
-    }
+  function parseMsg(raw) {
+    try { return JSON.parse(raw.replace(/```json|```/g,"").trim()); }
+    catch(e) { return { fr: raw, en: raw }; }
   }
 
   async function startConversation(p) {
     setPersona(p); setMessages([]); setTurnCount(0);
     setFeedback(null); setError(null); setScreen("chat"); setLoading(true);
-    setShowTranslation({});
     try {
       const data = await callAPI({
         model: "claude-sonnet-4-6",
@@ -182,8 +233,8 @@ function App() {
         messages: [{ role:"user", content:"La réunion commence. Accueille le commercial qui arrive à votre rendez-vous. Présente-toi brièvement. 2-3 phrases. JSON uniquement." }]
       });
       const raw = data.content?.map(c=>c.text||"").join("") || '{"fr":"Bonjour.","en":"Hello."}';
-      setMessages([{ role:"persona", payload: parsePersonaMsg(raw) }]);
-    } catch(e) { setError("Erreur de connexion. Vérifiez votre clé API."); }
+      setMessages([{ role:"persona", payload: parseMsg(raw) }]);
+    } catch(e) { setError(t("Erreur de connexion.","Connection error.")); }
     setLoading(false);
   }
 
@@ -193,7 +244,7 @@ function App() {
     setInput("");
     const newMessages = [...messages, { role:"seller", text: userMsg }];
     setMessages(newMessages);
-    setTurnCount(t => t+1);
+    setTurnCount(c => c+1);
     setLoading(true);
     try {
       const apiMessages = [
@@ -209,12 +260,12 @@ function App() {
       const data = await callAPI({
         model: "claude-sonnet-4-6",
         max_tokens: 600,
-        system: `${SYSTEM_PROMPT}\n\nTON PERSONA :\nNom : ${persona.name}\nPoste : ${persona.role}\nEntreprise : ${persona.company}\nContexte : ${persona.context}\nPersonnalité : ${persona.personality}\nHidden Pain : ${persona.hiddenPain}\nTours : ${turnCount+1}.${turnCount>=8?" Signale poliment que tu dois bientôt partir si aucune prochaine étape n'est proposée.":""}`,
+        system: `${SYSTEM_PROMPT}\n\nTON PERSONA :\nNom : ${persona.name}\nPoste : ${persona.role}\nEntreprise : ${persona.company}\nContexte : ${persona.context}\nPersonnalité : ${persona.personality}\nHidden Pain : ${persona.hiddenPain}\nTour : ${turnCount+1}.${turnCount>=8?" Signale poliment que tu dois bientôt partir si aucune prochaine étape n'est proposée.":""}`,
         messages: apiMessages
       });
       const raw = data.content?.map(c=>c.text||"").join("") || '{"fr":"...","en":"..."}';
-      setMessages([...newMessages, { role:"persona", payload: parsePersonaMsg(raw) }]);
-    } catch(e) { setError("Erreur lors de l'envoi."); }
+      setMessages([...newMessages, { role:"persona", payload: parseMsg(raw) }]);
+    } catch(e) { setError(t("Erreur lors de l'envoi.","Error sending message.")); }
     setLoading(false);
   }
 
@@ -242,7 +293,7 @@ function App() {
   // SELECT SCREEN
   if (screen === "select") return (
     <div style={{minHeight:"100vh",background:"#FAFAF8",fontFamily:font}}>
-      <div style={{maxWidth:920,margin:"0 auto",padding:"40px 24px"}}>
+      <div style={{maxWidth:960,margin:"0 auto",padding:"40px 24px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:40}}>
           <div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
@@ -252,18 +303,14 @@ function App() {
             <h1 style={{fontSize:36,fontWeight:700,color:"#1B1B1B",margin:"8px 0 10px",fontFamily:"'Fraunces',serif",lineHeight:1.15}}>
               {t("Choisissez votre prospect","Choose your prospect")}
             </h1>
-            <p style={{fontSize:15,color:"#666",lineHeight:1.6,maxWidth:560,margin:0}}>
-              {t("Menez un entretien de découverte WITY. La réponse du client s'affiche en français avec traduction anglaise.","Run a WITY discovery call. Client responses appear in French with English translation.")}
+            <p style={{fontSize:15,color:"#666",lineHeight:1.6,maxWidth:580,margin:0}}>
+              {t(
+                "Menez un entretien de découverte WITY avec des décideurs français réalistes. Chaque réponse s'affiche en français avec traduction anglaise.",
+                "Run a WITY discovery call with realistic French decision-makers. Each response appears in French with an English translation."
+              )}
             </p>
           </div>
-          <div style={{display:"flex",gap:6,flexShrink:0}}>
-            {["fr","en"].map(l=>(
-              <button key={l} onClick={()=>setLang(l)}
-                style={{padding:"6px 14px",border:`2px solid ${lang===l?green:"#DDD"}`,borderRadius:20,background:lang===l?"#E8F5E9":"#fff",color:lang===l?green:"#888",fontWeight:600,cursor:"pointer",fontSize:12}}>
-                {l==="fr"?"🇫🇷":"🇬🇧"}
-              </button>
-            ))}
-          </div>
+          <div style={{flexShrink:0,marginLeft:16,marginTop:4}}><LangToggle/></div>
         </div>
 
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(420px,1fr))",gap:16}}>
@@ -279,7 +326,7 @@ function App() {
                   <p style={{fontSize:13,color:"#888",margin:"2px 0 0"}}>{p.role} · {p.company}</p>
                 </div>
                 <span style={{fontSize:11,fontWeight:700,color:"#fff",background:p.diffColor,padding:"3px 10px",borderRadius:20,fontFamily:"'DM Mono',monospace",flexShrink:0,marginLeft:8}}>
-                  {t(p.difficulty, p.difficulty==="Moyen"?"Medium":"Hard")}
+                  {t(p.difficulty_fr, p.difficulty_en)}
                 </span>
               </div>
               <p style={{fontSize:13,color:"#555",lineHeight:1.55,margin:"0 0 14px"}}>{p.context.substring(0,170)}...</p>
@@ -301,7 +348,7 @@ function App() {
             <strong style={{color:green}}>{t("Rappel WITY :","WITY Reminder:")}</strong>{" "}
             {t(
               "Ouverture → Pain (4 niveaux) → Vision → Prochaine étape. Le client parle 70%. Chaque réponse s'affiche en FR + EN.",
-              "Opening → Pain (4 levels) → Vision → Next Step. Client talks 70%. Each response shows FR + EN."
+              "Opening → Pain (4 levels) → Vision → Next Step. The prospect talks 70%. Every response shows FR + EN."
             )}
           </p>
         </div>
@@ -315,17 +362,10 @@ function App() {
       <div style={{maxWidth:800,margin:"0 auto",padding:"40px 24px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
           <button onClick={()=>{setScreen("select");setFeedback(null);}}
-            style={{background:"none",border:"none",color:green,fontSize:14,fontWeight:600,cursor:"pointer",padding:0}}>
+            style={{background:"none",border:"none",color:green,fontSize:14,fontWeight:600,cursor:"pointer",padding:0,fontFamily:font}}>
             ← {t("Retour","Back")}
           </button>
-          <div style={{display:"flex",gap:6}}>
-            {["fr","en"].map(l=>(
-              <button key={l} onClick={()=>setLang(l)}
-                style={{padding:"6px 14px",border:`2px solid ${lang===l?green:"#DDD"}`,borderRadius:20,background:lang===l?"#E8F5E9":"#fff",color:lang===l?green:"#888",fontWeight:600,cursor:"pointer",fontSize:12}}>
-                {l==="fr"?"🇫🇷":"🇬🇧"}
-              </button>
-            ))}
-          </div>
+          <LangToggle/>
         </div>
 
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
@@ -380,7 +420,7 @@ function App() {
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{fontSize:18}}>{feedback.hiddenPainFound?"✅":"⚠️"}</span>
               <h3 style={{fontSize:14,fontWeight:700,margin:0,color:feedback.hiddenPainFound?green:"#E65100"}}>
-                Hidden Pain {feedback.hiddenPainFound?t("découvert !","found!"):(t("non découvert","not found"))}
+                Hidden Pain {feedback.hiddenPainFound ? t("découvert !","found!") : t("non découvert","not found")}
               </h3>
             </div>
             <p style={{fontSize:13,color:"#555",margin:0}}>{t(feedback.hiddenPainComment_fr,feedback.hiddenPainComment_en)}</p>
@@ -395,10 +435,10 @@ function App() {
           </div>
 
           <div style={{display:"flex",gap:12}}>
-            <button onClick={()=>startConversation(persona)} style={{flex:1,padding:"14px 20px",background:green,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer"}}>
-              {t(`Recommencer avec ${persona?.name?.split(" ")[0]}`,"Try again")}
+            <button onClick={()=>startConversation(persona)} style={{flex:1,padding:"14px 20px",background:green,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:font}}>
+              {t(`Recommencer avec ${persona?.name?.split(" ")[0]}`,`Try again with ${persona?.name?.split(" ")[0]}`)}
             </button>
-            <button onClick={()=>{setScreen("select");setFeedback(null);}} style={{flex:1,padding:"14px 20px",background:"#fff",color:green,border:`2px solid ${green}`,borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer"}}>
+            <button onClick={()=>{setScreen("select");setFeedback(null);}} style={{flex:1,padding:"14px 20px",background:"#fff",color:green,border:`2px solid ${green}`,borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:font}}>
               {t("Changer de prospect","Change prospect")}
             </button>
           </div>
@@ -416,23 +456,18 @@ function App() {
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <h2 style={{fontSize:16,fontWeight:700,color:"#1B1B1B",margin:0}}>{persona?.name}</h2>
-              <span style={{fontSize:10,fontWeight:700,color:"#fff",background:persona?.diffColor,padding:"2px 8px",borderRadius:10,fontFamily:"'DM Mono',monospace"}}>{t(persona?.difficulty,persona?.difficulty==="Moyen"?"Medium":"Hard")}</span>
+              <span style={{fontSize:10,fontWeight:700,color:"#fff",background:persona?.diffColor,padding:"2px 8px",borderRadius:10,fontFamily:"'DM Mono',monospace"}}>
+                {t(persona?.difficulty_fr, persona?.difficulty_en)}
+              </span>
             </div>
             <p style={{fontSize:12,color:"#888",margin:0}}>{persona?.role} · {persona?.company}</p>
           </div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{display:"flex",gap:4}}>
-            {["fr","en"].map(l=>(
-              <button key={l} onClick={()=>setLang(l)}
-                style={{padding:"4px 10px",border:`2px solid ${lang===l?green:"#DDD"}`,borderRadius:16,background:lang===l?"#E8F5E9":"#fff",color:lang===l?green:"#888",fontWeight:600,cursor:"pointer",fontSize:11}}>
-                {l==="fr"?"🇫🇷":"🇬🇧"}
-              </button>
-            ))}
-          </div>
+          <LangToggle/>
           <span style={{fontSize:12,color:"#AAA",fontFamily:"'DM Mono',monospace"}}>{turnCount}/12</span>
           {turnCount>=3 && (
-            <button onClick={requestFeedback} style={{padding:"8px 14px",background:green,color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:600,cursor:"pointer"}}>
+            <button onClick={requestFeedback} style={{padding:"8px 14px",background:green,color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:font}}>
               {t("Feedback","Feedback")}
             </button>
           )}
@@ -443,16 +478,17 @@ function App() {
         <div style={{background:"#F0F7F0",borderRadius:8,padding:"10px 14px",marginBottom:16,display:"flex",gap:10}}>
           <span style={{flexShrink:0}}>💡</span>
           <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.5}}>
-            <strong>WITY :</strong> {t(
-              "Ouverture → Pain (4 niveaux) → Vision → Prochaine étape. Cliquez 🇬🇧 sur chaque réponse pour voir la traduction.",
-              "Opening → Pain (4 levels) → Vision → Next Step. Click 🇫🇷 on responses to see French original."
+            <strong>WITY :</strong>{" "}
+            {t(
+              "Ouverture → Pain (4 niveaux) → Vision → Prochaine étape. Vous parlez max. 30%.",
+              "Opening → Pain (4 levels) → Vision → Next Step. You talk max. 30%."
             )}
           </p>
         </div>
 
-        {messages.map((m, i) => (
+        {messages.map((m,i)=>(
           <div key={i} style={{display:"flex",justifyContent:m.role==="seller"?"flex-end":"flex-start",marginBottom:14}}>
-            {m.role === "seller" ? (
+            {m.role==="seller" ? (
               <div style={{maxWidth:"72%",padding:"12px 16px",borderRadius:14,background:green,color:"#fff"}}>
                 <p style={{fontSize:14,margin:0,lineHeight:1.55,whiteSpace:"pre-wrap"}}>{m.text}</p>
               </div>
@@ -491,13 +527,13 @@ function App() {
             disabled={loading}
             style={{flex:1,padding:"12px 16px",borderRadius:10,border:"1px solid #DDD",fontSize:14,outline:"none",fontFamily:font,background:loading?"#F5F5F5":"#fff"}}/>
           <button onClick={sendMessage} disabled={loading||!input.trim()}
-            style={{padding:"12px 20px",background:loading||!input.trim()?"#CCC":green,color:"#fff",border:"none",borderRadius:10,fontSize:14,fontWeight:600,cursor:loading||!input.trim()?"default":"pointer",flexShrink:0}}>
+            style={{padding:"12px 20px",background:loading||!input.trim()?"#CCC":green,color:"#fff",border:"none",borderRadius:10,fontSize:14,fontWeight:600,cursor:loading||!input.trim()?"default":"pointer",flexShrink:0,fontFamily:font}}>
             {t("Envoyer","Send")}
           </button>
         </div>
         <div style={{display:"flex",justifyContent:"center",gap:16,marginTop:8}}>
-          {turnCount>=3 && <button onClick={requestFeedback} style={{background:"none",border:"none",color:green,fontSize:12,fontWeight:600,cursor:"pointer"}}>📊 {t("Terminer & Feedback","End & Feedback")}</button>}
-          <button onClick={()=>startConversation(persona)} style={{background:"none",border:"none",color:"#999",fontSize:12,cursor:"pointer"}}>↺ {t("Recommencer","Restart")}</button>
+          {turnCount>=3 && <button onClick={requestFeedback} style={{background:"none",border:"none",color:green,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:font}}>📊 {t("Terminer & Feedback","End & Feedback")}</button>}
+          <button onClick={()=>startConversation(persona)} style={{background:"none",border:"none",color:"#999",fontSize:12,cursor:"pointer",fontFamily:font}}>↺ {t("Recommencer","Restart")}</button>
         </div>
       </div>
     </div>
