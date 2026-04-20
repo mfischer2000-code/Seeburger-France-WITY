@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WITY Trainer — Marché Français</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,700&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; }
+    @keyframes spin { to { transform: rotate(360deg) } }
+    @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+const PERSONAS = [
+  {
+    id: "dsi-industrie",
+    name: "Laurent Mercier",
+    role: "DSI",
+    company: "Vaillant Industries, Lyon",
+    industry: "Industrie / Manufacturing",
+    difficulty: "Moyen",
+    diffColor: "#FF8F00",
+    context: "Groupe industriel français, 3.200 employés, 4 sites de production. En cours de migration SAP S/4HANA (go-live prévu T4 2026). Utilise un EDI legacy depuis 15 ans, non compatible S/4HANA. Deux intégrateurs différents selon les sites. Le projet EDI n'était pas dans le scope initial de la migration.",
+    personality: "Ingénieur de formation, pragmatique et factuel. Méfiant vis-à-vis des éditeurs qui promettent trop. Pose des questions techniques précises. S'impatiente si le commercial parle avant d'avoir compris le problème. Apprécie les références secteur et les chiffres concrets.",
+    hiddenPain: "Il a personnellement sous-estimé la complexité de l'intégration EDI dans le projet S/4HANA. Son directeur général lui a demandé un rapport d'étape dans 3 semaines. S'il n'a pas de solution crédible, le projet entier risque d'être retardé et sa crédibilité en tant que DSI sera remise en question.",
+    triggers: ["Migration S/4HANA", "EDI Legacy", "Intégration multi-sites", "Go-live T4 2026"]
+  },
+  {
+    id: "daf-einvoicing",
+    name: "Sophie Blanchard",
+    role: "Directrice Administrative et Financière",
+    company: "Groupe Hermès Distribution, Paris",
+    industry: "Distribution / Retail",
+    difficulty: "Difficile",
+    diffColor: "#D32F2F",
+    context: "Distributeur B2B national, 850 M€ de CA, 12.000 fournisseurs actifs. Obligation de facturation électronique : doit émettre des e-factures au format Factur-X dès janvier 2026 et recevoir via Peppol. Actuellement : 80% des factures traitées manuellement par une équipe de 12 personnes. Aucune solution en place.",
+    personality: "Directe, chiffres-orientée, peu de temps. Ne veut pas entendre parler de technologie — elle veut savoir combien ça coûte, combien ça économise, et si la conformité légale est garantie. Interrompt si c'est trop technique. Décide vite si elle est convaincue.",
+    hiddenPain: "Elle a reçu un avertissement informel de son expert-comptable : si l'entreprise n'est pas conforme à la date butoir, les factures émises pourraient ne pas être déductibles fiscalement, ce qui représente un risque de plusieurs millions d'euros. Elle n'en a parlé à personne en interne.",
+    triggers: ["Facture électronique obligatoire", "Peppol", "Factur-X", "Conformité fiscale 2026"]
+  },
+  {
+    id: "supply-chain-auto",
+    name: "Thierry Rousseau",
+    role: "Directeur Supply Chain",
+    company: "Précision Mécanique SA, Nantes",
+    industry: "Automotive Tier-2",
+    difficulty: "Moyen",
+    diffColor: "#FF8F00",
+    context: "Équipementier Tier-2 automobile, fournisseur de Stellantis, Renault et Valeo. Obligé d'échanger en EDI avec ces trois clients (formats différents : EDIFACT, ANSI X12, format propriétaire Renault). Utilise un prestataire EDI externalisé depuis 8 ans — contrat qui expire dans 6 mois, renégociation impossible aux conditions actuelles.",
+    personality: "Opérationnel, pense en flux et délais. Allergique aux interruptions de service. Comprend l'EDI en tant qu'utilisateur mais pas techniquement. Veut savoir si le prestataire peut reprendre les connexions existantes sans interruption. Demande systématiquement des SLA et des références clients automobiles.",
+    hiddenPain: "Stellantis vient de lui envoyer un courrier : à partir de juillet 2026, les ASN doivent être transmis en moins de 2 heures après expédition, sinon pénalités de 0,5% par heure de retard. Son système actuel prend 6 à 8 heures. Il n'a pas encore transmis cette information à sa direction.",
+    triggers: ["Fin de contrat EDI", "Pénalités OEM", "ASN temps réel", "Multi-formats"]
+  },
+  {
+    id: "dsi-retail-mna",
+    name: "Karim Benali",
+    role: "DSI Groupe",
+    company: "Éclat Retail Group, Bordeaux",
+    industry: "Retail / E-commerce",
+    difficulty: "Difficile",
+    diffColor: "#D32F2F",
+    context: "Groupe retail en forte croissance par acquisitions : 3 enseignes rachetées en 18 mois. Chaque enseigne a son propre ERP (SAP, Dynamics, Sage) et ses propres connexions EDI avec les fournisseurs. 4 systèmes d'intégration différents, aucune visibilité centralisée. Le COMEX a fixé un objectif : une seule plateforme d'intégration d'ici fin 2026.",
+    personality: "Politique, bon communicant, pense à son image auprès du COMEX. Sait qu'il a un problème mais attend que le commercial l'articule clairement. Sensible aux témoignages d'autres DSI dans le retail. Cherche un partenaire stratégique, pas un simple fournisseur. Sera difficile à convaincre si le commercial ne comprend pas les enjeux post-M&A.",
+    hiddenPain: "Le COMEX lui a fixé un budget et un délai — mais la vraie pression vient du fait que si la consolidation échoue, une partie de son équipe sera externalisée. Un cabinet de conseil a déjà été mandaté pour évaluer l'option outsourcing total. Il doit démontrer la valeur de son équipe en interne d'ici 12 mois.",
+    triggers: ["Consolidation post-M&A", "Multi-ERP", "Plateforme unique", "Visibilité temps réel"]
+  }
+];
+
+const SYSTEM_PROMPT = `Tu es un décideur français dans une simulation de formation commerciale pour les équipes de vente SEEBURGER (plateforme d'intégration B2B : EDI, API, iPaaS, MFT).
+
+RÈGLES DE JEU :
+- Tu joues le persona indiqué de façon RÉALISTE
+- Tu te comportes comme un vrai décideur français : direct, pragmatique, peu de temps
+- Tu ne donnes des informations que si le commercial pose les bonnes questions
+- Tu deviens IMPATIENT si le commercial pitch trop tôt sans comprendre ton problème
+- Tu te MONTRES SCEPTIQUE face aux généralités sans substance
+- Tu t'OUVRES quand le commercial montre qu'il comprend vraiment ton contexte
+- Ton "Hidden Pain" : tu ne le révèles QUE si le commercial sait creuser (impact personnel, conséquences, pression hiérarchique)
+- Tes réponses : 2-4 phrases, comme dans une vraie conversation
+
+FORMAT DE RÉPONSE — tu dois TOUJOURS répondre dans ce format JSON exact :
+{"fr":"[ta réponse en français]","en":"[English translation of your response]"}
+
+Rien d'autre. Uniquement ce JSON. Pas de texte avant ou après.`;
+
+const FEEDBACK_PROMPT = `Tu es un coach commercial B2B expérimenté. Tu viens d'analyser une conversation de discovery WITY entre un commercial SEEBURGER et un prospect français simulé.
+
+Réponds UNIQUEMENT avec un objet JSON (sans backticks, sans texte autour) :
+{
+  "score": 3,
+  "summary_fr": "2-3 phrases résumé",
+  "summary_en": "2-3 sentences summary in English",
+  "categories": [
+    {"name_fr":"Ouverture & Rapport","name_en":"Opening & Rapport","score":3,"feedback_fr":"...","feedback_en":"...","example":"..."},
+    {"name_fr":"Discovery Pain","name_en":"Pain Discovery","score":3,"feedback_fr":"...","feedback_en":"...","example":"..."},
+    {"name_fr":"Technique de questionnement","name_en":"Questioning Technique","score":3,"feedback_fr":"...","feedback_en":"...","example":"..."},
+    {"name_fr":"Posture WITY","name_en":"WITY Mindset","score":3,"feedback_fr":"...","feedback_en":"...","example":"..."},
+    {"name_fr":"Impact Business","name_en":"Business Impact","score":3,"feedback_fr":"...","feedback_en":"...","example":"..."},
+    {"name_fr":"Prochaine étape","name_en":"Next Step","score":3,"feedback_fr":"...","feedback_en":"...","example":"..."}
+  ],
+  "topTip_fr": "Le conseil le plus important",
+  "topTip_en": "Most important tip in English",
+  "hiddenPainFound": false,
+  "hiddenPainComment_fr": "...",
+  "hiddenPainComment_en": "..."
+}`;
+
+function ScoreBar({ score }) {
+  const color = score >= 4 ? "#2E7D32" : score >= 3 ? "#FF8F00" : "#D32F2F";
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
+      <div style={{flex:1,height:8,background:"#E8E8E8",borderRadius:4,overflow:"hidden"}}>
+        <div style={{width:`${score/5*100}%`,height:"100%",background:color,borderRadius:4}}/>
+      </div>
+      <span style={{fontWeight:700,color,fontSize:14,minWidth:28,textAlign:"right",fontFamily:"'DM Mono',monospace"}}>{score}/5</span>
+    </div>
+  );
+}
+
+function App() {
+  const [screen, setScreen] = useState("select");
+  const [apiKey, setApiKey] = useState("");
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [lang, setLang] = useState("fr"); // fr or en
+  const [persona, setPersona] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [turnCount, setTurnCount] = useState(0);
+  const [error, setError] = useState(null);
+  const [showTranslation, setShowTranslation] = useState({});
+  const chatEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => { chatEndRef.current?.scrollIntoView({behavior:"smooth"}); }, [messages, loading]);
+  useEffect(() => { if (screen === "chat") inputRef.current?.focus(); }, [screen, loading]);
+
+  const t = (fr, en) => lang === "fr" ? fr : en;
+
+  async function callAPI(payload) {
+    const res = await fetch("/api/claude", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  }
+
+  function parsePersonaMsg(raw) {
+    try {
+      const clean = raw.replace(/```json|```/g,"").trim();
+      return JSON.parse(clean);
+    } catch(e) {
+      return { fr: raw, en: raw };
+    }
+  }
+
+  async function startConversation(p) {
+    setPersona(p); setMessages([]); setTurnCount(0);
+    setFeedback(null); setError(null); setScreen("chat"); setLoading(true);
+    setShowTranslation({});
+    try {
+      const data = await callAPI({
+        model: "claude-sonnet-4-6",
+        max_tokens: 600,
+        system: `${SYSTEM_PROMPT}\n\nTON PERSONA :\nNom : ${p.name}\nPoste : ${p.role}\nEntreprise : ${p.company}\nSecteur : ${p.industry}\nContexte : ${p.context}\nPersonnalité : ${p.personality}\nHidden Pain (révèle seulement si très bien questionné) : ${p.hiddenPain}\nTriggers : ${p.triggers.join(", ")}`,
+        messages: [{ role:"user", content:"La réunion commence. Accueille le commercial qui arrive à votre rendez-vous. Présente-toi brièvement. 2-3 phrases. JSON uniquement." }]
+      });
+      const raw = data.content?.map(c=>c.text||"").join("") || '{"fr":"Bonjour.","en":"Hello."}';
+      setMessages([{ role:"persona", payload: parsePersonaMsg(raw) }]);
+    } catch(e) { setError("Erreur de connexion. Vérifiez votre clé API."); }
+    setLoading(false);
+  }
+
+  async function sendMessage() {
+    if (!input.trim() || loading) return;
+    const userMsg = input.trim();
+    setInput("");
+    const newMessages = [...messages, { role:"seller", text: userMsg }];
+    setMessages(newMessages);
+    setTurnCount(t => t+1);
+    setLoading(true);
+    try {
+      const apiMessages = [
+        { role:"user", content:"La réunion commence. Accueille le commercial. JSON uniquement." },
+        { role:"assistant", content: JSON.stringify(newMessages[0].payload) }
+      ];
+      for (let i = 1; i < newMessages.length; i++) {
+        apiMessages.push({
+          role: newMessages[i].role === "seller" ? "user" : "assistant",
+          content: newMessages[i].role === "seller" ? newMessages[i].text : JSON.stringify(newMessages[i].payload)
+        });
+      }
+      const data = await callAPI({
+        model: "claude-sonnet-4-6",
+        max_tokens: 600,
+        system: `${SYSTEM_PROMPT}\n\nTON PERSONA :\nNom : ${persona.name}\nPoste : ${persona.role}\nEntreprise : ${persona.company}\nContexte : ${persona.context}\nPersonnalité : ${persona.personality}\nHidden Pain : ${persona.hiddenPain}\nTours : ${turnCount+1}.${turnCount>=8?" Signale poliment que tu dois bientôt partir si aucune prochaine étape n'est proposée.":""}`,
+        messages: apiMessages
+      });
+      const raw = data.content?.map(c=>c.text||"").join("") || '{"fr":"...","en":"..."}';
+      setMessages([...newMessages, { role:"persona", payload: parsePersonaMsg(raw) }]);
+    } catch(e) { setError("Erreur lors de l'envoi."); }
+    setLoading(false);
+  }
+
+  async function requestFeedback() {
+    setFeedbackLoading(true); setScreen("feedback");
+    const transcript = messages.map(m =>
+      m.role === "seller" ? `COMMERCIAL: ${m.text}` : `CLIENT (${persona.name}): ${m.payload?.fr||""}`
+    ).join("\n\n");
+    try {
+      const data = await callAPI({
+        model: "claude-sonnet-4-6",
+        max_tokens: 2000,
+        system: FEEDBACK_PROMPT,
+        messages: [{ role:"user", content:`Persona: ${persona.name}, ${persona.role}, ${persona.company}\nHidden Pain: ${persona.hiddenPain}\n\n--- TRANSCRIPT ---\n${transcript}\n--- FIN ---\n\nJSON uniquement:` }]
+      });
+      const raw = data.content?.map(c=>c.text||"").join("") || "";
+      setFeedback(JSON.parse(raw.replace(/```json|```/g,"").trim()));
+    } catch(e) { setFeedback({ error:true }); }
+    setFeedbackLoading(false);
+  }
+
+  const green = "#2E7D32";
+  const font = "'DM Sans', system-ui, sans-serif";
+
+  // SELECT SCREEN
+  if (screen === "select") return (
+    <div style={{minHeight:"100vh",background:"#FAFAF8",fontFamily:font}}>
+      <div style={{maxWidth:920,margin:"0 auto",padding:"40px 24px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:40}}>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+              <div style={{width:32,height:4,background:green,borderRadius:2}}/>
+              <span style={{fontSize:12,fontWeight:700,letterSpacing:2,color:green,textTransform:"uppercase",fontFamily:"'DM Mono',monospace"}}>WITY Discovery Training</span>
+            </div>
+            <h1 style={{fontSize:36,fontWeight:700,color:"#1B1B1B",margin:"8px 0 10px",fontFamily:"'Fraunces',serif",lineHeight:1.15}}>
+              {t("Choisissez votre prospect","Choose your prospect")}
+            </h1>
+            <p style={{fontSize:15,color:"#666",lineHeight:1.6,maxWidth:560,margin:0}}>
+              {t("Menez un entretien de découverte WITY. La réponse du client s'affiche en français avec traduction anglaise.","Run a WITY discovery call. Client responses appear in French with English translation.")}
+            </p>
+          </div>
+          <div style={{display:"flex",gap:6,flexShrink:0}}>
+            {["fr","en"].map(l=>(
+              <button key={l} onClick={()=>setLang(l)}
+                style={{padding:"6px 14px",border:`2px solid ${lang===l?green:"#DDD"}`,borderRadius:20,background:lang===l?"#E8F5E9":"#fff",color:lang===l?green:"#888",fontWeight:600,cursor:"pointer",fontSize:12}}>
+                {l==="fr"?"🇫🇷":"🇬🇧"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(420px,1fr))",gap:16}}>
+          {PERSONAS.map(p=>(
+            <div key={p.id} onClick={()=>startConversation(p)}
+              style={{background:"#fff",borderRadius:12,padding:24,cursor:"pointer",border:"1px solid #E8E8E8",position:"relative",overflow:"hidden",transition:"all 0.2s"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor=green;e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(46,125,50,0.1)";}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="#E8E8E8";e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+              <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:green}}/>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+                <div>
+                  <h3 style={{fontSize:18,fontWeight:700,color:"#1B1B1B",margin:0,fontFamily:"'Fraunces',serif"}}>{p.name}</h3>
+                  <p style={{fontSize:13,color:"#888",margin:"2px 0 0"}}>{p.role} · {p.company}</p>
+                </div>
+                <span style={{fontSize:11,fontWeight:700,color:"#fff",background:p.diffColor,padding:"3px 10px",borderRadius:20,fontFamily:"'DM Mono',monospace",flexShrink:0,marginLeft:8}}>
+                  {t(p.difficulty, p.difficulty==="Moyen"?"Medium":"Hard")}
+                </span>
+              </div>
+              <p style={{fontSize:13,color:"#555",lineHeight:1.55,margin:"0 0 14px"}}>{p.context.substring(0,170)}...</p>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:14}}>
+                {p.triggers.map(trig=>(
+                  <span key={trig} style={{fontSize:11,color:green,background:"#E8F5E9",padding:"3px 10px",borderRadius:20,fontFamily:"'DM Mono',monospace"}}>{trig}</span>
+                ))}
+              </div>
+              <div style={{paddingTop:12,borderTop:"1px solid #F0F0F0",display:"flex",justifyContent:"space-between"}}>
+                <span style={{fontSize:13,color:green,fontWeight:600}}>{t("Démarrer →","Start →")}</span>
+                <span style={{fontSize:12,color:"#AAA"}}>{p.industry}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginTop:36,padding:"16px 20px",background:"#F0F7F0",borderRadius:8,borderLeft:`3px solid ${green}`}}>
+          <p style={{fontSize:13,color:"#555",margin:0,lineHeight:1.6}}>
+            <strong style={{color:green}}>{t("Rappel WITY :","WITY Reminder:")}</strong>{" "}
+            {t(
+              "Ouverture → Pain (4 niveaux) → Vision → Prochaine étape. Le client parle 70%. Chaque réponse s'affiche en FR + EN.",
+              "Opening → Pain (4 levels) → Vision → Next Step. Client talks 70%. Each response shows FR + EN."
+            )}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // FEEDBACK SCREEN
+  if (screen === "feedback") return (
+    <div style={{minHeight:"100vh",background:"#FAFAF8",fontFamily:font}}>
+      <div style={{maxWidth:800,margin:"0 auto",padding:"40px 24px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
+          <button onClick={()=>{setScreen("select");setFeedback(null);}}
+            style={{background:"none",border:"none",color:green,fontSize:14,fontWeight:600,cursor:"pointer",padding:0}}>
+            ← {t("Retour","Back")}
+          </button>
+          <div style={{display:"flex",gap:6}}>
+            {["fr","en"].map(l=>(
+              <button key={l} onClick={()=>setLang(l)}
+                style={{padding:"6px 14px",border:`2px solid ${lang===l?green:"#DDD"}`,borderRadius:20,background:lang===l?"#E8F5E9":"#fff",color:lang===l?green:"#888",fontWeight:600,cursor:"pointer",fontSize:12}}>
+                {l==="fr"?"🇫🇷":"🇬🇧"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+          <div style={{width:32,height:4,background:green,borderRadius:2}}/>
+          <span style={{fontSize:12,fontWeight:700,letterSpacing:2,color:green,textTransform:"uppercase",fontFamily:"'DM Mono',monospace"}}>{t("Évaluation","Evaluation")}</span>
+        </div>
+        <h1 style={{fontSize:30,fontWeight:700,color:"#1B1B1B",margin:"8px 0 6px",fontFamily:"'Fraunces',serif"}}>
+          {t("Votre feedback WITY","Your WITY Feedback")}
+        </h1>
+        <p style={{fontSize:14,color:"#888",margin:"0 0 32px"}}>
+          {t("Entretien avec","Conversation with")} {persona?.name} · {turnCount} {t("tours","rounds")}
+        </p>
+
+        {feedbackLoading && (
+          <div style={{textAlign:"center",padding:80}}>
+            <div style={{width:40,height:40,border:"3px solid #E8F5E9",borderTopColor:green,borderRadius:"50%",animation:"spin 0.8s linear infinite",margin:"0 auto 16px"}}/>
+            <p style={{color:"#666"}}>{t("Analyse en cours...","Analysing...")}</p>
+          </div>
+        )}
+
+        {feedback?.error && (
+          <div style={{background:"#FFF3F3",border:"1px solid #FFCDD2",borderRadius:8,padding:20}}>
+            <p style={{color:"#D32F2F",margin:0}}>{t("Impossible de générer le feedback.","Could not generate feedback.")}</p>
+          </div>
+        )}
+
+        {feedback && !feedback.error && <>
+          <div style={{background:"#fff",borderRadius:12,padding:28,border:"1px solid #E8E8E8",marginBottom:20}}>
+            <div style={{display:"flex",alignItems:"center",gap:20}}>
+              <div style={{width:64,height:64,borderRadius:"50%",background:feedback.score>=4?"#E8F5E9":feedback.score>=3?"#FFF8E1":"#FFEBEE",display:"flex",alignItems:"center",justifyContent:"center",border:`3px solid ${feedback.score>=4?green:feedback.score>=3?"#FF8F00":"#D32F2F"}`}}>
+                <span style={{fontSize:26,fontWeight:700,fontFamily:"'DM Mono',monospace",color:feedback.score>=4?green:feedback.score>=3?"#FF8F00":"#D32F2F"}}>{feedback.score}</span>
+              </div>
+              <div>
+                <h2 style={{fontSize:18,fontWeight:700,margin:0,fontFamily:"'Fraunces',serif"}}>{t("Note globale","Overall Score")}</h2>
+                <p style={{fontSize:14,color:"#666",margin:"4px 0 0",lineHeight:1.5}}>{t(feedback.summary_fr,feedback.summary_en)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+            {feedback.categories?.map((k,i)=>(
+              <div key={i} style={{background:"#fff",borderRadius:10,padding:20,border:"1px solid #E8E8E8"}}>
+                <h3 style={{fontSize:14,fontWeight:700,color:"#1B1B1B",margin:"0 0 10px"}}>{t(k.name_fr,k.name_en)}</h3>
+                <ScoreBar score={k.score}/>
+                <p style={{fontSize:13,color:"#555",margin:"10px 0 0",lineHeight:1.55}}>{t(k.feedback_fr,k.feedback_en)}</p>
+                {k.example && <div style={{marginTop:8,padding:"8px 12px",background:"#F8F8F6",borderRadius:6,borderLeft:"2px solid #CCC"}}><p style={{fontSize:12,color:"#777",margin:0,fontStyle:"italic"}}>"{k.example}"</p></div>}
+              </div>
+            ))}
+          </div>
+
+          <div style={{background:feedback.hiddenPainFound?"#E8F5E9":"#FFF8E1",borderRadius:10,padding:20,marginBottom:20,border:`1px solid ${feedback.hiddenPainFound?"#C8E6C9":"#FFE0B2"}`}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <span style={{fontSize:18}}>{feedback.hiddenPainFound?"✅":"⚠️"}</span>
+              <h3 style={{fontSize:14,fontWeight:700,margin:0,color:feedback.hiddenPainFound?green:"#E65100"}}>
+                Hidden Pain {feedback.hiddenPainFound?t("découvert !","found!"):(t("non découvert","not found"))}
+              </h3>
+            </div>
+            <p style={{fontSize:13,color:"#555",margin:0}}>{t(feedback.hiddenPainComment_fr,feedback.hiddenPainComment_en)}</p>
+            {!feedback.hiddenPainFound && <p style={{fontSize:12,color:"#888",margin:"8px 0 0",fontStyle:"italic"}}>{persona?.hiddenPain}</p>}
+          </div>
+
+          <div style={{background:"#fff",borderRadius:10,padding:20,border:`2px solid ${green}`,marginBottom:28}}>
+            <h3 style={{fontSize:13,fontWeight:700,color:green,margin:"0 0 8px",fontFamily:"'DM Mono',monospace",letterSpacing:1}}>
+              {t("CONSEIL CLÉ","KEY TIP")}
+            </h3>
+            <p style={{fontSize:15,color:"#1B1B1B",margin:0,lineHeight:1.55,fontWeight:500}}>{t(feedback.topTip_fr,feedback.topTip_en)}</p>
+          </div>
+
+          <div style={{display:"flex",gap:12}}>
+            <button onClick={()=>startConversation(persona)} style={{flex:1,padding:"14px 20px",background:green,color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer"}}>
+              {t(`Recommencer avec ${persona?.name?.split(" ")[0]}`,"Try again")}
+            </button>
+            <button onClick={()=>{setScreen("select");setFeedback(null);}} style={{flex:1,padding:"14px 20px",background:"#fff",color:green,border:`2px solid ${green}`,borderRadius:8,fontSize:14,fontWeight:600,cursor:"pointer"}}>
+              {t("Changer de prospect","Change prospect")}
+            </button>
+          </div>
+        </>}
+      </div>
+    </div>
+  );
+
+  // CHAT SCREEN
+  return (
+    <div style={{height:"100vh",display:"flex",flexDirection:"column",background:"#FAFAF8",fontFamily:font}}>
+      <div style={{background:"#fff",borderBottom:"1px solid #E8E8E8",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <button onClick={()=>setScreen("select")} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:"#888",padding:0}}>←</button>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <h2 style={{fontSize:16,fontWeight:700,color:"#1B1B1B",margin:0}}>{persona?.name}</h2>
+              <span style={{fontSize:10,fontWeight:700,color:"#fff",background:persona?.diffColor,padding:"2px 8px",borderRadius:10,fontFamily:"'DM Mono',monospace"}}>{t(persona?.difficulty,persona?.difficulty==="Moyen"?"Medium":"Hard")}</span>
+            </div>
+            <p style={{fontSize:12,color:"#888",margin:0}}>{persona?.role} · {persona?.company}</p>
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{display:"flex",gap:4}}>
+            {["fr","en"].map(l=>(
+              <button key={l} onClick={()=>setLang(l)}
+                style={{padding:"4px 10px",border:`2px solid ${lang===l?green:"#DDD"}`,borderRadius:16,background:lang===l?"#E8F5E9":"#fff",color:lang===l?green:"#888",fontWeight:600,cursor:"pointer",fontSize:11}}>
+                {l==="fr"?"🇫🇷":"🇬🇧"}
+              </button>
+            ))}
+          </div>
+          <span style={{fontSize:12,color:"#AAA",fontFamily:"'DM Mono',monospace"}}>{turnCount}/12</span>
+          {turnCount>=3 && (
+            <button onClick={requestFeedback} style={{padding:"8px 14px",background:green,color:"#fff",border:"none",borderRadius:6,fontSize:12,fontWeight:600,cursor:"pointer"}}>
+              {t("Feedback","Feedback")}
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div style={{flex:1,overflow:"auto",padding:"16px 20px 8px"}}>
+        <div style={{background:"#F0F7F0",borderRadius:8,padding:"10px 14px",marginBottom:16,display:"flex",gap:10}}>
+          <span style={{flexShrink:0}}>💡</span>
+          <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.5}}>
+            <strong>WITY :</strong> {t(
+              "Ouverture → Pain (4 niveaux) → Vision → Prochaine étape. Cliquez 🇬🇧 sur chaque réponse pour voir la traduction.",
+              "Opening → Pain (4 levels) → Vision → Next Step. Click 🇫🇷 on responses to see French original."
+            )}
+          </p>
+        </div>
+
+        {messages.map((m, i) => (
+          <div key={i} style={{display:"flex",justifyContent:m.role==="seller"?"flex-end":"flex-start",marginBottom:14}}>
+            {m.role === "seller" ? (
+              <div style={{maxWidth:"72%",padding:"12px 16px",borderRadius:14,background:green,color:"#fff"}}>
+                <p style={{fontSize:14,margin:0,lineHeight:1.55,whiteSpace:"pre-wrap"}}>{m.text}</p>
+              </div>
+            ) : (
+              <div style={{maxWidth:"78%"}}>
+                <div style={{padding:"12px 16px",borderRadius:14,background:"#fff",border:"1px solid #E8E8E8"}}>
+                  <p style={{fontSize:11,fontWeight:700,color:green,margin:"0 0 4px",fontFamily:"'DM Mono',monospace"}}>{persona?.name}</p>
+                  <p style={{fontSize:14,margin:0,lineHeight:1.55,whiteSpace:"pre-wrap"}}>{m.payload?.fr}</p>
+                </div>
+                <div style={{marginTop:4,padding:"8px 12px",background:"#F5F9FF",borderRadius:8,border:"1px solid #E0E8F5"}}>
+                  <p style={{fontSize:11,fontWeight:600,color:"#5B8DD9",margin:"0 0 3px",fontFamily:"'DM Mono',monospace"}}>🇬🇧 EN</p>
+                  <p style={{fontSize:13,margin:0,lineHeight:1.5,color:"#555",fontStyle:"italic"}}>{m.payload?.en}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {loading && (
+          <div style={{display:"flex",justifyContent:"flex-start",marginBottom:12}}>
+            <div style={{background:"#fff",border:"1px solid #E8E8E8",borderRadius:14,padding:"12px 20px",display:"flex",gap:5}}>
+              {[0,1,2].map(j=><div key={j} style={{width:7,height:7,borderRadius:"50%",background:"#CCC",animation:`pulse 1s ease-in-out ${j*0.15}s infinite`}}/>)}
+            </div>
+          </div>
+        )}
+
+        {error && <div style={{background:"#FFEBEE",borderRadius:8,padding:"10px 14px",marginBottom:12}}><p style={{fontSize:13,color:"#D32F2F",margin:0}}>{error}</p></div>}
+        <div ref={chatEndRef}/>
+      </div>
+
+      <div style={{background:"#fff",borderTop:"1px solid #E8E8E8",padding:"12px 16px",flexShrink:0}}>
+        <div style={{display:"flex",gap:10,maxWidth:820,margin:"0 auto"}}>
+          <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();}}}
+            placeholder={t("Votre message en tant que commercial...","Your message as a seller...")}
+            disabled={loading}
+            style={{flex:1,padding:"12px 16px",borderRadius:10,border:"1px solid #DDD",fontSize:14,outline:"none",fontFamily:font,background:loading?"#F5F5F5":"#fff"}}/>
+          <button onClick={sendMessage} disabled={loading||!input.trim()}
+            style={{padding:"12px 20px",background:loading||!input.trim()?"#CCC":green,color:"#fff",border:"none",borderRadius:10,fontSize:14,fontWeight:600,cursor:loading||!input.trim()?"default":"pointer",flexShrink:0}}>
+            {t("Envoyer","Send")}
+          </button>
+        </div>
+        <div style={{display:"flex",justifyContent:"center",gap:16,marginTop:8}}>
+          {turnCount>=3 && <button onClick={requestFeedback} style={{background:"none",border:"none",color:green,fontSize:12,fontWeight:600,cursor:"pointer"}}>📊 {t("Terminer & Feedback","End & Feedback")}</button>}
+          <button onClick={()=>startConversation(persona)} style={{background:"none",border:"none",color:"#999",fontSize:12,cursor:"pointer"}}>↺ {t("Recommencer","Restart")}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
